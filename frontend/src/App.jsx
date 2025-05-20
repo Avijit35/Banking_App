@@ -1,7 +1,15 @@
 import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Homepage from "../components/Home";
 
 const App = () => {
-  return <h1 className="text-5xl text-red-500 font-bold">Banking App</h1>;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Homepage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 };
 
 export default App;
