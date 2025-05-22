@@ -7,6 +7,7 @@ import {
   VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
+import { Link } from "react-router-dom";
 const { Header, Sider, Content } = Layout;
 
 const Homelayout = ({ children }) => {
@@ -17,16 +18,7 @@ const Homelayout = ({ children }) => {
   return (
     <Layout>
       <Header style={{ padding: 0, background: colorBgContainer }}>
-        <Button
-          type="text"
-          icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            fontSize: "16px",
-            width: 64,
-            height: 64,
-          }}
-        />
+        <Link to="/admin">Admin</Link>
       </Header>
       <Content
         style={{
