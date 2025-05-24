@@ -5,10 +5,44 @@ import {
   EditOutlined,
   EyeInvisibleFilled,
 } from "@ant-design/icons";
+import { trimData } from "../../../modules/modules";
+import axios from "axios";
+import swal from "sweetalert";
+import { useState } from "react";
 
+axios.defaults.baseURL = import.meta.env.VITE_BASEURL;
 const { Item } = Form;
 
 const NewEmployee = () => {
+  //states collection
+  const [empForm] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
+  //create new employee
+  const onFinish = async (values) => {
+    try {
+      setLoading(true);
+      const finalObj = trimData(values);
+      const { data } = await axios.post("/api/user", finalObj);
+      swal("Success", "Employee created !", "success");
+      empForm.resetFields();
+    } catch (err) {
+      if (err?.response?.data?.error?.code === 11000) {
+        empForm.setFields([
+          {
+            name: "email",
+            errors: ["Email already exists !"],
+          },
+        ]);
+      } else {
+        swal("Warning", "Try again later !", "warning");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //columns for tables
   const columns = [
     {
       title: "Profile",
@@ -63,7 +97,12 @@ const NewEmployee = () => {
     <Adminlayout>
       <div className="grid md:grid-cols-3 gap-3">
         <Card title="Add new employee">
-          <Form layout="vertical">
+          <Form
+            layout="vertical"
+            form={empForm}
+            onFinish={onFinish}
+            autoComplete="on"
+          >
             <Item name="photo" label="Profile">
               <Input type="file" />
             </Item>
@@ -86,7 +125,7 @@ const NewEmployee = () => {
                 label="Password"
                 rules={[{ required: true }]}
               >
-                <Input />
+                <Input.Password />
               </Item>
             </div>
             <Item label="Address" name="address">
@@ -95,6 +134,7 @@ const NewEmployee = () => {
             <Button
               htmlType="submit"
               type="text"
+              loading={loading}
               className="!bg-blue-500 !font-bold !text-white !w-full"
             >
               Submit
