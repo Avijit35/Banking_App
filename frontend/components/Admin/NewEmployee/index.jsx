@@ -5,7 +5,7 @@ import {
   EditOutlined,
   EyeInvisibleFilled,
 } from "@ant-design/icons";
-import { trimData } from "../../../modules/modules";
+import { http, trimData } from "../../../modules/modules";
 import axios from "axios";
 import swal from "sweetalert";
 import { useState } from "react";
@@ -23,7 +23,8 @@ const NewEmployee = () => {
     try {
       setLoading(true);
       const finalObj = trimData(values);
-      const { data } = await axios.post("/api/user", finalObj);
+      const httpReq = http();
+      const { data } = await httpReq.post("/api/user", finalObj);
       swal("Success", "Employee created !", "success");
       empForm.resetFields();
     } catch (err) {
