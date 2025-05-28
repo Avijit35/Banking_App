@@ -17,16 +17,34 @@ const NewEmployee = () => {
   //states collection
   const [empForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState(null);
 
   //create new employee
+  const handleUpload = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append("photo", file);
+      const httpReq = http();
+      const { data } = await httpReq.post("/api/upload", formData);
+      setPhoto(data.filePath);
+    } catch (error) {
+      swal("Failed", "Unable to upload file", "warning");
+    }
+  };
+
   const onFinish = async (values) => {
     try {
       setLoading(true);
       const finalObj = trimData(values);
+      finalObj.profile = photo ? photo : "bankImages/userImage.jpg";
       const httpReq = http();
       const { data } = await httpReq.post("/api/user", finalObj);
-      swal("Success", "Employee created !", "success");
+
       empForm.resetFields();
+      setPhoto(null);
+
+      swal("Success", "Employee created !", "success");
     } catch (err) {
       if (err?.response?.data?.error?.code === 11000) {
         empForm.setFields([
@@ -105,7 +123,7 @@ const NewEmployee = () => {
             autoComplete="on"
           >
             <Item name="photo" label="Profile">
-              <Input type="file" />
+              <Input type="file" onChange={handleUpload} />
             </Item>
             <div className="grid md:grid-cols-2 gap-x-2">
               <Item
