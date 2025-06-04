@@ -9,6 +9,7 @@ import { http, trimData } from "../../../modules/modules";
 import axios from "axios";
 import swal from "sweetalert";
 import { useState } from "react";
+import Password from "antd/es/input/Password";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASEURL;
 const { Item } = Form;
@@ -40,6 +41,14 @@ const NewEmployee = () => {
       finalObj.profile = photo ? photo : "bankImages/userImage.jpg";
       const httpReq = http();
       const { data } = await httpReq.post("/api/user", finalObj);
+
+      const mailobj = {
+        email: values.email,
+        password: values.password,
+      };
+
+      const res = await httpReq.post("/api/send-email", mailobj);
+      console.log(res);
 
       empForm.resetFields();
       setPhoto(null);
