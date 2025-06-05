@@ -1,4 +1,4 @@
-import { createNewRecord } from "../services/db.service.js";
+import { createNewRecord, findAllRecord } from "../services/db.service.js";
 
 const createData = async (req, res, schema) => {
   try {
@@ -26,4 +26,20 @@ const createData = async (req, res, schema) => {
   }
 };
 
-export { createData };
+const fetchData = async (req, res, schema) => {
+  try {
+    const data = await findAllRecord(schema);
+
+    return res.status(200).json({
+      messge: "Record found !",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      messge: "Internal server error",
+      error,
+    });
+  }
+};
+
+export { createData, fetchData };

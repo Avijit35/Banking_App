@@ -1,14 +1,14 @@
-import { Button, Card, Form, Input, Table } from "antd";
+import { Button, Card, Form, Image, Input, message, Table } from "antd";
 import Adminlayout from "../../Layout/Adminlayout";
 import {
   DeleteOutlined,
   EditOutlined,
   EyeInvisibleFilled,
+  EyeOutlined,
 } from "@ant-design/icons";
 import { http, trimData } from "../../../modules/modules";
 import axios from "axios";
-import swal from "sweetalert";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Password from "antd/es/input/Password";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASEURL;
@@ -19,6 +19,24 @@ const NewEmployee = () => {
   const [empForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [photo, setPhoto] = useState(null);
+  const [messageApi, context] = message.useMessage();
+  const [allEmployee, setAllEmployee] = useState([]);
+
+  //get all employee data
+  useEffect(() => {
+    const fetcher = async () => {
+      try {
+        const httpReq = http();
+        const { data } = await httpReq.get("/api/user");
+        setAllEmployee(data.data);
+      } catch (error) {
+        console.log(error);
+        messageApi.error("Unable to fetch data !");
+      }
+    };
+
+    fetcher();
+  }, []);
 
   //create new employee
   const handleUpload = async (e) => {
@@ -30,7 +48,7 @@ const NewEmployee = () => {
       const { data } = await httpReq.post("/api/upload", formData);
       setPhoto(data.filePath);
     } catch (error) {
-      swal("Failed", "Unable to upload file", "warning");
+      messageApi.error("Failed Unable to upload file");
     }
   };
 
@@ -48,12 +66,11 @@ const NewEmployee = () => {
       };
 
       const res = await httpReq.post("/api/send-email", mailobj);
-      console.log(res);
 
       empForm.resetFields();
       setPhoto(null);
 
-      swal("Success", "Employee created !", "success");
+      messageApi.success("Employee created !");
     } catch (err) {
       if (err?.response?.data?.error?.code === 11000) {
         empForm.setFields([
@@ -63,7 +80,7 @@ const NewEmployee = () => {
           },
         ]);
       } else {
-        swal("Warning", "Try again later !", "warning");
+        messageApi.error("Try again later !");
       }
     } finally {
       setLoading(false);
@@ -75,6 +92,14 @@ const NewEmployee = () => {
     {
       title: "Profile",
       key: "profile",
+      render: (_, obj) => (
+        <Image
+          src={`${import.meta.env.VITE_BASEURL}/${obj.profile}`}
+          className="rounded-full"
+          height={40}
+          width={40}
+        />
+      ),
     },
     {
       title: "Fullname",
@@ -99,12 +124,17 @@ const NewEmployee = () => {
     {
       title: "Action",
       key: "action",
-      render: () => (
+      fixed: "right",
+      render: (_, obj) => (
         <div className="flex gap-1">
           <Button
             type="text"
-            className="!bg-pink-100 !text-pink-500"
-            icon={<EyeInvisibleFilled />}
+            className={`${
+              obj.isActive
+                ? "!bg-indigo-100 !text-indigo-500"
+                : "!bg-pink-100 !text-pink-500"
+            }`}
+            icon={obj.isActive ? <EyeOutlined /> : <EyeInvisibleFilled />}
           />
           <Button
             type="text"
@@ -123,6 +153,7 @@ const NewEmployee = () => {
 
   return (
     <Adminlayout>
+      {context}
       <div className="grid md:grid-cols-3 gap-3">
         <Card title="Add new employee">
           <Form
@@ -169,8 +200,16 @@ const NewEmployee = () => {
             </Button>
           </Form>
         </Card>
-        <Card title="Employee list" className="md:col-span-2">
-          <Table columns={columns} dataSource={[{}, {}]} />
+        <Card
+          title="Employee list"
+          className="md:col-span-2"
+          style={{ overflowX: "scroll" }}
+        >
+          <Table
+            columns={columns}
+            dataSource={allEmployee}
+            scroll={{ x: "max-content" }}
+          />
         </Card>
       </div>
     </Adminlayout>
