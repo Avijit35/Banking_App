@@ -1,4 +1,9 @@
-import { createNewRecord, findAllRecord } from "../services/db.service.js";
+import {
+  createNewRecord,
+  deleteRecord,
+  findAllRecord,
+  updateRecord,
+} from "../services/db.service.js";
 
 const createData = async (req, res, schema) => {
   try {
@@ -42,4 +47,39 @@ const fetchData = async (req, res, schema) => {
   }
 };
 
-export { createData, fetchData };
+const updateData = async (req, res, schema) => {
+  try {
+    const { id } = req.params;
+    const data = req.body;
+    const dbRes = await updateRecord(id, data, schema);
+
+    return res.status(200).json({
+      messge: "Record updated !",
+      data: dbRes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      messge: "Internal server error",
+      error,
+    });
+  }
+};
+
+const deleteData = async (req, res, schema) => {
+  try {
+    const { id } = req.params;
+    const data = await deleteRecord(id, schema);
+
+    return res.status(200).json({
+      messge: "Record deleted !",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      messge: "Internal server error",
+      error,
+    });
+  }
+};
+
+export { createData, fetchData, deleteData, updateData };
