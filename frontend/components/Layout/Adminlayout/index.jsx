@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import {
   DashboardOutlined,
+  GiftOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UploadOutlined,
   UserOutlined,
-  VideoCameraOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -17,6 +16,11 @@ const Adminlayout = ({ children }) => {
       key: "/admin",
       icon: <DashboardOutlined />,
       label: <Link to="/admin">Dashboard</Link>,
+    },
+    {
+      key: "/admin/branding",
+      icon: <GiftOutlined />,
+      label: <Link to="/admin/branding">Branding</Link>,
     },
     {
       key: "/admin/new-employee",

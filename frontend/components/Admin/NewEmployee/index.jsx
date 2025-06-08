@@ -18,7 +18,6 @@ import {
 import { http, trimData } from "../../../modules/modules";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import Password from "antd/es/input/Password";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASEURL;
 const { Item } = Form;
@@ -31,6 +30,7 @@ const NewEmployee = () => {
   const [messageApi, context] = message.useMessage();
   const [allEmployee, setAllEmployee] = useState([]);
   const [no, setNo] = useState(0);
+  const [edit, setEdit] = useState(null);
 
   //get all employee data
   useEffect(() => {
@@ -114,6 +114,34 @@ const NewEmployee = () => {
     }
   };
 
+  //update employee
+  const onEditUser = (obj) => {
+    setEdit(obj);
+    empForm.setFieldsValue(obj);
+  };
+
+  const onUpdateUser = async (values) => {
+    try {
+      setLoading(true);
+      const finalObj = values;
+      if (photo) {
+        finalObj.profile = photo;
+      }
+      const httpReq = http();
+      await httpReq.put(`api/user/${edit._id}`, finalObj);
+
+      setEdit(null);
+      empForm.resetFields();
+      setPhoto(null);
+      setNo(no + 1);
+      messageApi.success("Employee updated successfully");
+    } catch (err) {
+      messageApi.error("Unable to update employee !");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   //delete employee
   const onDeleteUser = async (id) => {
     try {
@@ -183,11 +211,18 @@ const NewEmployee = () => {
               icon={obj.isActive ? <EyeOutlined /> : <EyeInvisibleFilled />}
             />
           </Popconfirm>
-          <Button
-            type="text"
-            className="!bg-green-100 !text-green-500"
-            icon={<EditOutlined />}
-          />
+          <Popconfirm
+            title="Are you Sure ?"
+            description="Once update, you can also re-update !"
+            onCancel={() => messageApi.info("No changes occur !")}
+            onConfirm={() => onEditUser(obj)}
+          >
+            <Button
+              type="text"
+              className="!bg-green-100 !text-green-500"
+              icon={<EditOutlined />}
+            />
+          </Popconfirm>
           <Popconfirm
             title="Are you sure ?"
             description="Once you deleted, you can not restore !"
@@ -213,7 +248,7 @@ const NewEmployee = () => {
           <Form
             layout="vertical"
             form={empForm}
-            onFinish={onFinish}
+            onFinish={edit ? onUpdateUser : onFinish}
             autoComplete="on"
           >
             <Item name="photo" label="Profile">
@@ -238,20 +273,31 @@ const NewEmployee = () => {
                 label="Password"
                 rules={[{ required: true }]}
               >
-                <Input.Password />
+                <Input.Password disabled={edit ? true : false} />
               </Item>
             </div>
             <Item label="Address" name="address">
               <Input.TextArea />
             </Item>
-            <Button
-              htmlType="submit"
-              type="text"
-              loading={loading}
-              className="!bg-blue-500 !font-bold !text-white !w-full"
-            >
-              Submit
-            </Button>
+            {edit ? (
+              <Button
+                htmlType="submit"
+                type="text"
+                loading={loading}
+                className="!bg-rose-500 !font-bold !text-white !w-full"
+              >
+                Update
+              </Button>
+            ) : (
+              <Button
+                htmlType="submit"
+                type="text"
+                loading={loading}
+                className="!bg-blue-500 !font-bold !text-white !w-full"
+              >
+                Submit
+              </Button>
+            )}
           </Form>
         </Card>
         <Card
