@@ -6,6 +6,7 @@ const branchSchema = new Schema(
       type: String,
       unique: true,
     },
+    key: String,
     branchAddress: String,
   },
   { timestamps: true }
