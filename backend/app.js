@@ -15,8 +15,9 @@ const corsOptions = {
 //required router files
 import userRouter from "./routes/user.routes.js";
 import uploadRouter from "./routes/upload.routes.js";
-import EmailRouter from "./routes/send-email.routes.js";
-import BrandingRouter from "./routes/branding.routes.js";
+import emailRouter from "./routes/send-email.routes.js";
+import brandingRouter from "./routes/branding.routes.js";
+import branchRouter from "./routes/branch.routes.js";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -32,8 +33,9 @@ app.use(cors(corsOptions));
 //route level middlewares
 app.use("/api/user", userRouter);
 app.use("/api/upload", uploadRouter);
-app.use("/api/send-email", EmailRouter);
-app.use("/api/branding", BrandingRouter);
+app.use("/api/send-email", emailRouter);
+app.use("/api/branding", brandingRouter);
+app.use("/api/branch", branchRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

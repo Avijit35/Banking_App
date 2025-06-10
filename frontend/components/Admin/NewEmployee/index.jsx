@@ -38,7 +38,6 @@ const NewEmployee = () => {
         const { data } = await httpReq.get("/api/user");
         setAllEmployee(data.data);
       } catch (error) {
-        console.log(error);
         messageApi.error("Unable to fetch data !");
       }
     };
@@ -242,7 +241,7 @@ const NewEmployee = () => {
     <Adminlayout>
       {context}
       <div className="grid md:grid-cols-3 gap-3">
-        <Card title="Add new employee">
+        <Card title="Add New Employee">
           <Form
             layout="vertical"
             form={empForm}
@@ -299,7 +298,7 @@ const NewEmployee = () => {
           </Form>
         </Card>
         <Card
-          title="Employee list"
+          title="Employee List"
           className="md:col-span-2"
           style={{ overflowX: "scroll" }}
         >
