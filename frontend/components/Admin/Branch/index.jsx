@@ -1,20 +1,6 @@
-import {
-  Button,
-  Card,
-  Form,
-  Image,
-  Input,
-  message,
-  Popconfirm,
-  Table,
-} from "antd";
+import { Button, Card, Form, Input, message, Popconfirm, Table } from "antd";
 import Adminlayout from "../../Layout/Adminlayout";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  EyeInvisibleFilled,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { http, trimData } from "../../../modules/modules";
 import { useEffect, useState } from "react";
 
