@@ -16,10 +16,8 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import { http, trimData } from "../../../modules/modules";
-import axios from "axios";
 import { useEffect, useState } from "react";
 
-axios.defaults.baseURL = import.meta.env.VITE_BASEURL;
 const { Item } = Form;
 
 const NewEmployee = () => {
@@ -123,7 +121,7 @@ const NewEmployee = () => {
   const onUpdateUser = async (values) => {
     try {
       setLoading(true);
-      const finalObj = values;
+      const finalObj = trimData(values);
       if (photo) {
         finalObj.profile = photo;
       }

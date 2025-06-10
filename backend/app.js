@@ -16,6 +16,7 @@ const corsOptions = {
 import userRouter from "./routes/user.routes.js";
 import uploadRouter from "./routes/upload.routes.js";
 import EmailRouter from "./routes/send-email.routes.js";
+import BrandingRouter from "./routes/branding.routes.js";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -32,6 +33,7 @@ app.use(cors(corsOptions));
 app.use("/api/user", userRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/send-email", EmailRouter);
+app.use("/api/branding", BrandingRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
