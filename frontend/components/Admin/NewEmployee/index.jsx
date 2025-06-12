@@ -6,6 +6,7 @@ import {
   Input,
   message,
   Popconfirm,
+  Select,
   Table,
 } from "antd";
 import Adminlayout from "../../Layout/Adminlayout";
@@ -15,8 +16,9 @@ import {
   EyeInvisibleFilled,
   EyeOutlined,
 } from "@ant-design/icons";
-import { http, trimData } from "../../../modules/modules";
+import { fetchData, http, trimData } from "../../../modules/modules";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 const { Item } = Form;
 
@@ -27,8 +29,32 @@ const NewEmployee = () => {
   const [photo, setPhoto] = useState(null);
   const [messageApi, context] = message.useMessage();
   const [allEmployee, setAllEmployee] = useState([]);
+  const [allBranch, setAllBranch] = useState([]);
   const [no, setNo] = useState(0);
   const [edit, setEdit] = useState(null);
+
+  //get branch data
+  const { data: branches, error: bError } = useSWR("/api/branch", fetchData, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    refreshInterval: 120000,
+  });
+
+  useEffect(() => {
+    if (branches) {
+      let filter =
+        branches &&
+        branches?.data.map((item) => {
+          return {
+            label: item.branchName,
+            value: item.branchName,
+            key: item.key,
+          };
+        });
+
+      setAllBranch(filter);
+    }
+  }, [branches]);
 
   //get all employee data
   useEffect(() => {
@@ -51,6 +77,8 @@ const NewEmployee = () => {
       setLoading(true);
       const finalObj = trimData(values);
       finalObj.profile = photo ? photo : "bankImages/userImage.jpg";
+      finalObj.userType = "employee";
+      finalObj.key = finalObj.email;
       const httpReq = http();
       const { data } = await httpReq.post("/api/user", finalObj);
 
@@ -167,6 +195,20 @@ const NewEmployee = () => {
       ),
     },
     {
+      title: "User Type",
+      dataIndex: "userType",
+      key: "userType",
+      render: (text) => {
+        if (text === "admin") {
+          return <span className="text-indigo-500 capitalize">{text}</span>;
+        } else if (text === "employee") {
+          return <span className="text-green-500 capitalize">{text}</span>;
+        } else {
+          return <span className="text-red-500 capitalize">{text}</span>;
+        }
+      },
+    },
+    {
       title: "Fullname",
       dataIndex: "fullname",
       key: "fullname",
@@ -180,6 +222,11 @@ const NewEmployee = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+    },
+    {
+      title: "Branch",
+      dataIndex: "branch",
+      key: "branch",
     },
     {
       title: "Address",
@@ -248,6 +295,13 @@ const NewEmployee = () => {
             onFinish={edit ? onUpdateUser : onFinish}
             autoComplete="on"
           >
+            <Item
+              name="branch"
+              label="Select Branch"
+              rules={[{ required: true }]}
+            >
+              <Select placeholder="Select branch" options={allBranch} />
+            </Item>
             <Item name="photo" label="Profile">
               <Input type="file" onChange={handleUpload} />
             </Item>

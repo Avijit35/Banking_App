@@ -11,6 +11,8 @@ const userSchema = new Schema(
     },
     password: String,
     profile: String,
+    key: String,
+    branch: String,
     address: String,
     userType: String,
     isActive: {
