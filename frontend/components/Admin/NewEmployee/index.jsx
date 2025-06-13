@@ -15,6 +15,7 @@ import {
   EditOutlined,
   EyeInvisibleFilled,
   EyeOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import { fetchData, http, trimData } from "../../../modules/modules";
 import { useEffect, useState } from "react";
@@ -29,6 +30,7 @@ const NewEmployee = () => {
   const [photo, setPhoto] = useState(null);
   const [messageApi, context] = message.useMessage();
   const [allEmployee, setAllEmployee] = useState([]);
+  const [finalEmployees, setfinalEmployees] = useState([]);
   const [allBranch, setAllBranch] = useState([]);
   const [no, setNo] = useState(0);
   const [edit, setEdit] = useState(null);
@@ -63,6 +65,7 @@ const NewEmployee = () => {
         const httpReq = http();
         const { data } = await httpReq.get("/api/user");
         setAllEmployee(data.data);
+        setfinalEmployees(data.data);
       } catch (error) {
         messageApi.error("Unable to fetch data !");
       }
@@ -178,6 +181,39 @@ const NewEmployee = () => {
     } catch (err) {
       messageApi.error("Unable to delete user !");
     }
+  };
+
+  //Search User by all
+  const onSearch = (e) => {
+    const value = e.target.value.trim().toLowerCase();
+    const filter =
+      finalEmployees &&
+      finalEmployees.filter((Item) => {
+        if (Item.fullname.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (Item.email.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (
+          Item.address &&
+          Item.address.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (Item.userType.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (
+          Item.mobile &&
+          Item.mobile.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (
+          Item.branch &&
+          Item.branch.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        }
+      });
+
+    setAllEmployee(filter);
   };
 
   //columns for tables
@@ -355,6 +391,15 @@ const NewEmployee = () => {
           title="Employee List"
           className="md:col-span-2"
           style={{ overflowX: "scroll" }}
+          extra={
+            <div>
+              <Input
+                placeholder="Search by all"
+                prefix={<SearchOutlined />}
+                onChange={onSearch}
+              />
+            </div>
+          }
         >
           <Table
             columns={columns}
