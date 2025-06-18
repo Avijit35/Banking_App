@@ -20,6 +20,11 @@ const findAllRecord = async (schema) => {
   return dbRes;
 };
 
+const findOneRecord = async (query, schema) => {
+  const dbRes = await schema.findOne(query);
+  return dbRes;
+};
+
 const createNewRecord = async (data, schema) => {
   const dbRes = await new schema(data).save();
   return dbRes;
@@ -35,4 +40,10 @@ const deleteRecord = async (id, schema) => {
   return dbRes;
 };
 
-export { findAllRecord, createNewRecord, updateRecord, deleteRecord };
+export {
+  findAllRecord,
+  findOneRecord,
+  createNewRecord,
+  updateRecord,
+  deleteRecord,
+};
