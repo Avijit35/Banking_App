@@ -1,11 +1,17 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Card, Form, Input, message } from "antd";
 import { trimData, http } from "../../../modules/modules";
+import Cookies from "universal-cookie";
+import { useNavigate } from "react-router-dom";
 
 const { Item } = Form;
 
 const Login = () => {
+  const cookies = new Cookies();
+  const expires = new Date();
+  expires.setDate(expires.getDate() + 3);
   const [messageApi, context] = message.useMessage();
+  const navigate = useNavigate();
 
   const onFinish = async (values) => {
     try {
@@ -13,10 +19,31 @@ const Login = () => {
       const httpReq = http();
 
       const { data } = await httpReq.post("/api/login", finalObj);
-      console.log(data);
-      messageApi.success("Login Success");
+      if (data?.isLoged && data?.userType === "admin") {
+        const { token } = data;
+        cookies.set("authToken", token, {
+          path: "/",
+          expires,
+        });
+        navigate("/admin");
+      } else if (data?.isLoged && data?.userType === "employee") {
+        const { token } = data;
+        cookies.set("authToken", token, {
+          path: "/",
+          expires,
+        });
+        navigate("/employee");
+      } else if (data?.isLoged && data?.userType === "customer") {
+        const { token } = data;
+        cookies.set("authToken", token, {
+          path: "/",
+          expires,
+        });
+        navigate("/customer");
+      } else {
+        return message.warning("Invalid credentials !");
+      }
     } catch (err) {
-      console.log(err);
       messageApi.error(err?.response?.data?.message);
     }
   };

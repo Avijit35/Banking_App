@@ -19,7 +19,8 @@
     "react-router-dom": "^7.6.0",
     "sweetalert": "^2.1.2",
     "swr": "^2.3.3",
-    "tailwindcss": "^4.1.7"
+    "tailwindcss": "^4.1.7",
+    "universal-cookie": "^8.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",

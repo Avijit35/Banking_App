@@ -43,8 +43,9 @@ const LoginFunc = async (req, res, schema) => {
 
     return res.status(200).json({
       message: "Data found !",
-      isLogged: true,
+      isLoged: true,
       token,
+      userType: dbRes._doc.userType,
     });
   } catch (error) {
     return res.status(500).json({
