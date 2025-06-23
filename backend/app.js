@@ -20,6 +20,7 @@ import brandingRouter from "./routes/branding.routes.js";
 import branchRouter from "./routes/branch.routes.js";
 import currencyRouter from "./routes/currency.routes.js";
 import loginRouter from "./routes/login.routes.js";
+import verifyRouter from "./routes/verify.routes.js";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -33,6 +34,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors(corsOptions));
 
 //route level middlewares
+app.use("/api/verify-token", verifyRouter);
 app.use("/api/user", userRouter);
 app.use("/api/upload", uploadRouter);
 app.use("/api/send-email", emailRouter);
