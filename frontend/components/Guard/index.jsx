@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import Cookies from "universal-cookie";
 import { http } from "../../modules/modules.js";
 import { Navigate, Outlet } from "react-router-dom";
+import Loader from "../Loader/index.jsx";
 
 const Guard = ({ endpoint, role }) => {
   const cookies = new Cookies();
   const token = cookies.get("authToken");
   const [authorized, setAuthorized] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const [userType, setUserType] = useState(null);
 
   if (token === undefined) {
     return <Navigate to="/" />;
@@ -24,28 +27,35 @@ const Guard = ({ endpoint, role }) => {
         const { data } = await httpReq.get(endpoint);
         if (data?.isVerified) {
           setAuthorized(true);
+          setLoader(false);
           sessionStorage.setItem("userInfo", JSON.stringify(data?.data));
+          setUserType(data?.data?.userType);
         } else {
           setAuthorized(false);
+          setLoader(false);
         }
       } catch (err) {
         setAuthorized(false);
+        setLoader(false);
       }
     };
 
     verifyToken();
   }, [endpoint]);
-  console.log(authorized);
-  if (authorized && role === "admin") {
-    return <Outlet />;
-  } else if (authorized && role === "employee") {
-    return <Outlet />;
-  } else if (authorized && role === "customer") {
-    return <Outlet />;
+
+  if (loader) {
+    return <Loader />;
   }
-  // else {
-  //   return <Navigate to="/" />;
-  // }
+
+  if (authorized && role === userType) {
+    return <Outlet />;
+  } else if (authorized && role === userType) {
+    return <Outlet />;
+  } else if (authorized && role === userType) {
+    return <Outlet />;
+  } else {
+    return <Navigate to="/" />;
+  }
 };
 
 export default Guard;
