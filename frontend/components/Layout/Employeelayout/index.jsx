@@ -4,20 +4,44 @@ import {
   DashboardOutlined,
   DollarCircleOutlined,
   GiftOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Cookies from "universal-cookie";
 const { Header, Sider, Content } = Layout;
 
 const Employeelayout = ({ children }) => {
+  const cookies = new Cookies();
+  const navigate = useNavigate();
+
+  const Logout = () => {
+    sessionStorage.removeItem("userInfo");
+    cookies.remove("authToken");
+    navigate("/");
+  };
+
   const items = [
     {
       key: "/employee",
       icon: <DashboardOutlined />,
       label: <Link to="/employee">Dashboard</Link>,
+    },
+    {
+      key: "/employee/logout",
+      icon: <LogoutOutlined />,
+      label: (
+        <Button
+          type="text"
+          className="!text-gray-300 !font-semibold"
+          onClick={Logout}
+        >
+          Logout
+        </Button>
+      ),
     },
   ];
 
