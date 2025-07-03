@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import {
-  BranchesOutlined,
+  AccountBookOutlined,
   DashboardOutlined,
-  DollarCircleOutlined,
-  GiftOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -29,6 +26,11 @@ const Employeelayout = ({ children }) => {
       key: "/employee",
       icon: <DashboardOutlined />,
       label: <Link to="/employee">Dashboard</Link>,
+    },
+    {
+      key: "/employee/new-employee",
+      icon: <AccountBookOutlined />,
+      label: <Link to="/employee/new-employee">New Account</Link>,
     },
     {
       key: "/employee/logout",
