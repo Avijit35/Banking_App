@@ -68,7 +68,7 @@ const NewEmployee = () => {
     const fetcher = async () => {
       try {
         const httpReq = http();
-        const { data } = await httpReq.get("/api/user");
+        const { data } = await httpReq.get("/api/users");
         setAllEmployee(data.data);
         setfinalEmployees(data.data);
       } catch (error) {
@@ -88,7 +88,7 @@ const NewEmployee = () => {
       finalObj.userType = "employee";
       finalObj.key = finalObj.email;
       const httpReq = http();
-      const { data } = await httpReq.post("/api/user", finalObj);
+      const { data } = await httpReq.post("/api/users", finalObj);
 
       const mailobj = {
         email: values.email,
@@ -136,7 +136,7 @@ const NewEmployee = () => {
         isActive: !isActive,
       };
       const httpReq = http();
-      await httpReq.put(`api/user/${id}`, obj);
+      await httpReq.put(`api/users/${id}`, obj);
 
       setNo(no + 1);
       messageApi.success("IsActive Updated");
@@ -159,7 +159,7 @@ const NewEmployee = () => {
         finalObj.profile = photo;
       }
       const httpReq = http();
-      await httpReq.put(`api/user/${edit._id}`, finalObj);
+      await httpReq.put(`api/users/${edit._id}`, finalObj);
 
       setEdit(null);
       empForm.resetFields();
@@ -177,7 +177,7 @@ const NewEmployee = () => {
   const onDeleteUser = async (id) => {
     try {
       const httpReq = http();
-      await httpReq.delete(`api/user/${id}`);
+      await httpReq.delete(`api/users/${id}`);
 
       setNo(no + 1);
       messageApi.success("Employee deleted successfully");

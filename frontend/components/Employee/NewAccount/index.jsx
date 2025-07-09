@@ -8,12 +8,13 @@ import {
   trimData,
   uploadFile,
 } from "../../../modules/modules";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 
 const { Item } = Form;
 
 const NewAccount = () => {
   const [accountForm] = Form.useForm();
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
 
   //states collection
   const [accountModal, setAccountModal] = useState(false);
@@ -31,42 +32,45 @@ const NewAccount = () => {
     refreshInterval: 120000,
   });
 
+  let bankAccountNo = Number(branding && branding?.data[0]?.bankAccountNo) + 1;
+  let brandingId = branding && branding?.data[0]?._id;
+
   useEffect(() => {
-    if (accountModal)
-      // verify ref link with current
-      accountForm.setFieldValue(
-        "accountNo",
-        Number(branding && branding?.data[0]?.bankAccountNo) + 1
-      );
+    if (accountModal) accountForm.setFieldValue("accountNo", bankAccountNo);
   }, [accountModal]);
 
   //create new acoount
   const onFinish = async (values) => {
     try {
-      // setLoading(true);
+      setLoading(true);
       const finalObj = trimData(values);
       finalObj.profile = photo ? photo : "bankImages/userImage.jpg";
       finalObj.document = document ? document : "bankImages/userImage.jpg";
       finalObj.signature = signature ? signature : "bankImages/userImage.jpg";
-      finalObj.userType = "customer";
       finalObj.key = finalObj.email;
-      console.log(finalObj);
-      // const httpReq = http();
-      // const { data } = await httpReq.post("/api/user", finalObj);
+      finalObj.userType = "customer";
+      finalObj.branch = userInfo?.branch;
+      finalObj.createdBy = userInfo?.email;
 
-      // const mailobj = {
-      //   email: values.email,
-      //   password: values.password,
-      // };
+      const httpReq = http();
+      await httpReq.post("/api/users", finalObj);
+      await httpReq.post("/api/customers", finalObj);
 
-      // const res = await httpReq.post("/api/send-email", mailobj);
+      const mailobj = {
+        email: values.email,
+        password: values.password,
+      };
 
-      // accountForm.resetFields();
-      // setPhoto(null);
-      // setDocument(null);
-      // setSignature(null);
-      // setNo(no + 1);
-      // messageApi.success("Account created !");
+      await httpReq.post("/api/send-email", mailobj);
+      await httpReq.put(`/api/branding/${brandingId}`, { bankAccountNo });
+
+      accountForm.resetFields();
+      mutate("api/branding");
+      setPhoto(null);
+      setDocument(null);
+      setSignature(null);
+      setNo(no + 1);
+      messageApi.success("Account created !");
     } catch (err) {
       if (err?.response?.data?.error?.code === 11000) {
         accountForm.setFields([
@@ -79,7 +83,7 @@ const NewAccount = () => {
         messageApi.error("Try again later !");
       }
     } finally {
-      // setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -382,6 +386,7 @@ const NewAccount = () => {
             </Item>
             <Item className="flex justify-end items-center">
               <Button
+                loading={loading}
                 type="text"
                 htmlType="submit"
                 className="!bg-blue-500 !font-semibold !text-white"

@@ -51,7 +51,7 @@ const Branding = () => {
 
       const httpReq = http();
       await httpReq.post("/api/branding", finalObj);
-      await httpReq.post("/api/user", userInfo);
+      await httpReq.post("/api/users", userInfo);
 
       setPhoto(null);
       bankForm.resetFields();

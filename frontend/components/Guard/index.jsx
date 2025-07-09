@@ -49,10 +49,6 @@ const Guard = ({ endpoint, role }) => {
 
   if (authorized && role === userType) {
     return <Outlet />;
-  } else if (authorized && role === userType) {
-    return <Outlet />;
-  } else if (authorized && role === userType) {
-    return <Outlet />;
   } else {
     return <Navigate to="/" />;
   }
