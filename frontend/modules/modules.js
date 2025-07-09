@@ -13,7 +13,14 @@ export const http = (accessToken = null) => {
 export const trimData = (obj) => {
   let finalobj = {};
   for (let key in obj) {
-    finalobj[key] = obj[key]?.trim();
+    let value = obj[key];
+    if (typeof value === "string") {
+      finalobj[key] = value.trim();
+    } else if (typeof value === "number" || typeof value === "boolean") {
+      finalobj[key] = value.toString();
+    } else {
+      finalobj[key] = value;
+    }
   }
   return finalobj;
 };
@@ -26,5 +33,22 @@ export const fetchData = async (api) => {
     return data;
   } catch (error) {
     return null;
+  }
+};
+
+//upload file
+export const uploadFile = async (file, folderName) => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const httpReq = http();
+    const response = await httpReq.post(
+      `/api/upload?folderName=${folderName}`,
+      formData
+    );
+    return response.data;
+  } catch (error) {
+    return error.response?.data || error;
   }
 };

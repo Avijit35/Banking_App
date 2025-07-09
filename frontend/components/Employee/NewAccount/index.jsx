@@ -1,16 +1,14 @@
-import {
-  Button,
-  Card,
-  DatePicker,
-  Form,
-  Input,
-  Modal,
-  Select,
-  Table,
-} from "antd";
+import { Button, Card, Form, Input, message, Modal, Select, Table } from "antd";
 import Employeelayout from "../../Layout/Employeelayout";
 import { SearchOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  http,
+  fetchData,
+  trimData,
+  uploadFile,
+} from "../../../modules/modules";
+import useSWR from "swr";
 
 const { Item } = Form;
 
@@ -19,9 +17,106 @@ const NewAccount = () => {
 
   //states collection
   const [accountModal, setAccountModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [photo, setPhoto] = useState(null);
+  const [document, setDocument] = useState(null);
+  const [signature, setSignature] = useState(null);
+  const [messageApi, context] = message.useMessage();
+  const [no, setNo] = useState(0);
 
-  const onFinish = (values) => {
-    console.log(values);
+  //get branding data
+  const { data: branding, error: bError } = useSWR("api/branding", fetchData, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    refreshInterval: 120000,
+  });
+
+  useEffect(() => {
+    if (accountModal)
+      // verify ref link with current
+      accountForm.setFieldValue(
+        "accountNo",
+        Number(branding && branding?.data[0]?.bankAccountNo) + 1
+      );
+  }, [accountModal]);
+
+  //create new acoount
+  const onFinish = async (values) => {
+    try {
+      // setLoading(true);
+      const finalObj = trimData(values);
+      finalObj.profile = photo ? photo : "bankImages/userImage.jpg";
+      finalObj.document = document ? document : "bankImages/userImage.jpg";
+      finalObj.signature = signature ? signature : "bankImages/userImage.jpg";
+      finalObj.userType = "customer";
+      finalObj.key = finalObj.email;
+      console.log(finalObj);
+      // const httpReq = http();
+      // const { data } = await httpReq.post("/api/user", finalObj);
+
+      // const mailobj = {
+      //   email: values.email,
+      //   password: values.password,
+      // };
+
+      // const res = await httpReq.post("/api/send-email", mailobj);
+
+      // accountForm.resetFields();
+      // setPhoto(null);
+      // setDocument(null);
+      // setSignature(null);
+      // setNo(no + 1);
+      // messageApi.success("Account created !");
+    } catch (err) {
+      if (err?.response?.data?.error?.code === 11000) {
+        accountForm.setFields([
+          {
+            name: "email",
+            errors: ["Email already exists !"],
+          },
+        ]);
+      } else {
+        messageApi.error("Try again later !");
+      }
+    } finally {
+      // setLoading(false);
+    }
+  };
+
+  //handle Photo Upload
+  const handlePhoto = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const folderName = "customerPhoto";
+      const result = await uploadFile(file, folderName);
+      setPhoto(result.filePath);
+    } catch (err) {
+      messageApi.error("Upload Failed !");
+    }
+  };
+
+  //handle document Upload
+  const handleDocument = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const folderName = "customerDocument";
+      const result = await uploadFile(file, folderName);
+      setDocument(result.filePath);
+    } catch (err) {
+      messageApi.error("Upload Failed !");
+    }
+  };
+
+  //handle signature Upload
+  const handleSignature = async (e) => {
+    try {
+      const file = e.target.files[0];
+      const folderName = "customerSignature";
+      const result = await uploadFile(file, folderName);
+      setSignature(result.filePath);
+    } catch (err) {
+      messageApi.error("Upload Failed !");
+    }
   };
 
   //columns for tables
@@ -164,6 +259,7 @@ const NewAccount = () => {
 
   return (
     <Employeelayout>
+      {context}
       <div className="grid">
         <Card
           title="Account List"
@@ -205,7 +301,7 @@ const NewAccount = () => {
                 name="accountNo"
                 rules={[{ required: true }]}
               >
-                <Input placeholder="Account No" />
+                <Input disabled placeholder="Account No" />
               </Item>
               <Item
                 label="Fullname"
@@ -235,7 +331,7 @@ const NewAccount = () => {
                 <Input.Password placeholder="Password" />
               </Item>
               <Item label="DOB" name="dob" rules={[{ required: true }]}>
-                <DatePicker className="w-full" />
+                <Input type="date" />
               </Item>
               <Item label="Gender" name="gender" rules={[{ required: true }]}>
                 <Select
@@ -259,22 +355,26 @@ const NewAccount = () => {
                   ]}
                 />
               </Item>
-              <Item label="Photo" name="photo" rules={[{ required: true }]}>
-                <Input type="file" />
+              <Item
+                label="Photo"
+                name="photo"
+                // rules={[{ required: true }]}
+              >
+                <Input type="file" onChange={handlePhoto} />
               </Item>
               <Item
                 label="Signature"
                 name="signature"
-                rules={[{ required: true }]}
+                // rules={[{ required: true }]}
               >
-                <Input type="file" />
+                <Input type="file" onChange={handleSignature} />
               </Item>
               <Item
                 label="Document"
                 name="document"
-                rules={[{ required: true }]}
+                // rules={[{ required: true }]}
               >
-                <Input type="file" />
+                <Input type="file" onChange={handleDocument} />
               </Item>
             </div>
             <Item label="Address" name="address" rules={[{ required: true }]}>
