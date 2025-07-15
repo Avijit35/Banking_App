@@ -44,6 +44,7 @@ const NewAccount = () => {
   const [finalCustomer, setFinalCustomer] = useState([]);
   const [messageApi, context] = message.useMessage();
   const [no, setNo] = useState(0);
+  const [edit, setEdit] = useState(null);
 
   //get branding data
   const { data: branding, error: bError } = useSWR("api/branding", fetchData, {
@@ -179,7 +180,8 @@ const NewAccount = () => {
   //update employee
   const onEditCustomer = (obj) => {
     setEdit(obj);
-    empForm.setFieldsValue(obj);
+    setAccountModal(true);
+    accountForm.setFieldsValue(obj);
   };
 
   const onUpdateCustomer = async (values) => {
@@ -190,16 +192,25 @@ const NewAccount = () => {
       if (photo) {
         finalObj.profile = photo;
       }
+      if (document) {
+        finalObj.document = document;
+      }
+      if (signature) {
+        finalObj.signature = signature;
+      }
       const httpReq = http();
-      await httpReq.put(`api/users/${edit._id}`, finalObj);
+      await httpReq.put(`api/customers/${edit._id}`, finalObj);
 
       setEdit(null);
-      empForm.resetFields();
+      accountForm.resetFields();
       setPhoto(null);
+      setDocument(null);
+      setSignature(null);
       setNo(no + 1);
-      messageApi.success("Employee updated successfully");
+      setAccountModal(false);
+      messageApi.success("Customer updated successfully");
     } catch (err) {
-      messageApi.error("Unable to update employee !");
+      messageApi.error("Unable to update Customer !");
     } finally {
       setLoading(false);
     }
@@ -445,7 +456,11 @@ const NewAccount = () => {
           footer={null}
           title="Open New Account"
         >
-          <Form layout="vertical" form={accountForm} onFinish={onFinish}>
+          <Form
+            layout="vertical"
+            form={accountForm}
+            onFinish={edit ? onUpdateCustomer : onFinish}
+          >
             <div className="grid md:grid-cols-3 gap-x-3">
               <Item
                 label="Account No"
@@ -472,14 +487,17 @@ const NewAccount = () => {
                 <Input placeholder="Father Name" />
               </Item>
               <Item label="Email" name="email" rules={[{ required: true }]}>
-                <Input placeholder="Email" />
+                <Input disabled={edit ? true : false} placeholder="Email" />
               </Item>
               <Item
                 label="Password"
                 name="password"
                 rules={[{ required: true }]}
               >
-                <Input.Password placeholder="Password" />
+                <Input.Password
+                  disabled={edit ? true : false}
+                  placeholder="Password"
+                />
               </Item>
               <Item label="DOB" name="dob" rules={[{ required: true }]}>
                 <Input type="date" />
@@ -508,21 +526,21 @@ const NewAccount = () => {
               </Item>
               <Item
                 label="Photo"
-                name="photo"
+                name="xyz"
                 // rules={[{ required: true }]}
               >
                 <Input type="file" onChange={handlePhoto} />
               </Item>
               <Item
                 label="Signature"
-                name="signature"
+                name="dlf"
                 // rules={[{ required: true }]}
               >
                 <Input type="file" onChange={handleSignature} />
               </Item>
               <Item
                 label="Document"
-                name="document"
+                name="dsr"
                 // rules={[{ required: true }]}
               >
                 <Input type="file" onChange={handleDocument} />
@@ -532,14 +550,25 @@ const NewAccount = () => {
               <Input.TextArea />
             </Item>
             <Item className="flex justify-end items-center">
-              <Button
-                loading={loading}
-                type="text"
-                htmlType="submit"
-                className="!bg-blue-500 !font-semibold !text-white"
-              >
-                Submit
-              </Button>
+              {edit ? (
+                <Button
+                  loading={loading}
+                  type="text"
+                  htmlType="submit"
+                  className="!bg-red-500 !font-semibold !text-white"
+                >
+                  Update
+                </Button>
+              ) : (
+                <Button
+                  loading={loading}
+                  type="text"
+                  htmlType="submit"
+                  className="!bg-blue-500 !font-semibold !text-white"
+                >
+                  Submit
+                </Button>
+              )}
             </Item>
           </Form>
         </Modal>
