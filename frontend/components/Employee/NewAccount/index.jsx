@@ -1,6 +1,24 @@
-import { Button, Card, Form, Input, message, Modal, Select, Table } from "antd";
+import {
+  Button,
+  Card,
+  Form,
+  Image,
+  Input,
+  message,
+  Modal,
+  Popconfirm,
+  Select,
+  Table,
+} from "antd";
 import Employeelayout from "../../Layout/Employeelayout";
-import { SearchOutlined } from "@ant-design/icons";
+import {
+  DeleteFilled,
+  DownloadOutlined,
+  EditOutlined,
+  EyeInvisibleFilled,
+  EyeOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import {
   http,
@@ -22,6 +40,8 @@ const NewAccount = () => {
   const [photo, setPhoto] = useState(null);
   const [document, setDocument] = useState(null);
   const [signature, setSignature] = useState(null);
+  const [allCustomer, setAllCustomer] = useState([]);
+  const [finalCustomer, setFinalCustomer] = useState([]);
   const [messageApi, context] = message.useMessage();
   const [no, setNo] = useState(0);
 
@@ -31,6 +51,22 @@ const NewAccount = () => {
     revalidateOnReconnect: false,
     refreshInterval: 120000,
   });
+
+  //get all customer data
+  useEffect(() => {
+    const fetcher = async () => {
+      try {
+        const httpReq = http();
+        const { data } = await httpReq.get("/api/customers");
+        setAllCustomer(data?.data);
+        setFinalCustomer(data?.data);
+      } catch (error) {
+        messageApi.error("Unable to fetch data !");
+      }
+    };
+
+    fetcher();
+  }, [no]);
 
   let bankAccountNo = Number(branding && branding?.data[0]?.bankAccountNo) + 1;
   let brandingId = branding && branding?.data[0]?._id;
@@ -70,6 +106,7 @@ const NewAccount = () => {
       setDocument(null);
       setSignature(null);
       setNo(no + 1);
+      setAccountModal(false);
       messageApi.success("Account created !");
     } catch (err) {
       if (err?.response?.data?.error?.code === 11000) {
@@ -123,8 +160,143 @@ const NewAccount = () => {
     }
   };
 
+  //update isActive
+  const updateIsActive = async (id, isActive) => {
+    try {
+      const obj = {
+        isActive: !isActive,
+      };
+      const httpReq = http();
+      await httpReq.put(`api/customers/${id}`, obj);
+
+      setNo(no + 1);
+      messageApi.success("IsActive Updated");
+    } catch (err) {
+      messageApi.error("Unable to update isActtive !");
+    }
+  };
+
+  //update employee
+  const onEditCustomer = (obj) => {
+    setEdit(obj);
+    empForm.setFieldsValue(obj);
+  };
+
+  const onUpdateCustomer = async (values) => {
+    try {
+      setLoading(true);
+      const finalObj = trimData(values);
+      delete finalObj.password;
+      if (photo) {
+        finalObj.profile = photo;
+      }
+      const httpReq = http();
+      await httpReq.put(`api/users/${edit._id}`, finalObj);
+
+      setEdit(null);
+      empForm.resetFields();
+      setPhoto(null);
+      setNo(no + 1);
+      messageApi.success("Employee updated successfully");
+    } catch (err) {
+      messageApi.error("Unable to update employee !");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //delete customer
+  const onDeleteCustomer = async (id) => {
+    try {
+      const httpReq = http();
+      await httpReq.delete(`api/customers/${id}`);
+
+      setNo(no + 1);
+      messageApi.success("Customer deleted successfully");
+    } catch (err) {
+      messageApi.error("Unable to delete customer !");
+    }
+  };
+
+  //Search User by all
+  const onSearch = (e) => {
+    const value = e.target.value.trim().toLowerCase();
+    const filter =
+      finalCustomer &&
+      finalCustomer.filter((Item) => {
+        if (Item?.fullname.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (Item?.email.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (
+          Item.address &&
+          Item?.address.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (Item?.userType.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (
+          Item.mobile &&
+          Item?.mobile.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (
+          Item.branch &&
+          Item?.branch.toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (Item?.accountNo.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        } else if (
+          Item?.finalBalance.toString().toLowerCase().indexOf(value) != -1
+        ) {
+          return Item;
+        } else if (Item?.createdBy.toLowerCase().indexOf(value) != -1) {
+          return Item;
+        }
+      });
+
+    setAllCustomer(filter);
+  };
+
   //columns for tables
   const columns = [
+    {
+      title: "Photo",
+      key: "photo",
+      render: (_, obj) => (
+        <Image
+          src={`${import.meta.env.VITE_BASEURL}/${obj.profile}`}
+          className="rounded-full"
+          height={40}
+          width={40}
+        />
+      ),
+    },
+    {
+      title: "Signature",
+      key: "signature",
+      render: (_, obj) => (
+        <Image
+          src={`${import.meta.env.VITE_BASEURL}/${obj.signature}`}
+          className="rounded-full"
+          height={40}
+          width={40}
+        />
+      ),
+    },
+    {
+      title: "Document",
+      key: "document",
+      render: (_, obj) => (
+        <Button
+          type="text"
+          shape="circle"
+          className="!bg-blue-100 !text-blue-500"
+          icon={<DownloadOutlined />}
+        />
+      ),
+    },
     {
       title: "Branch",
       dataIndex: "branch",
@@ -148,6 +320,11 @@ const NewAccount = () => {
       title: "Account No",
       dataIndex: "accountNo",
       key: "accountNo",
+    },
+    {
+      title: "Balance",
+      dataIndex: "finalBalance",
+      key: "finalBalance",
     },
     {
       title: "Fullname",
@@ -175,41 +352,11 @@ const NewAccount = () => {
       key: "address",
     },
     {
-      title: "Photo",
-      key: "photo",
-      render: (_, obj) => (
-        <Image
-          src={`${import.meta.env.VITE_BASEURL}/${obj.profile}`}
-          className="rounded-full"
-          height={40}
-          width={40}
-        />
-      ),
+      title: "Created By",
+      dataIndex: "createdBy",
+      key: "createdBy",
     },
-    {
-      title: "Signature",
-      key: "signature",
-      render: (_, obj) => (
-        <Image
-          src={`${import.meta.env.VITE_BASEURL}/${obj.profile}`}
-          className="rounded-full"
-          height={40}
-          width={40}
-        />
-      ),
-    },
-    {
-      title: "Document",
-      key: "document",
-      render: (_, obj) => (
-        <Image
-          src={`${import.meta.env.VITE_BASEURL}/${obj.profile}`}
-          className="rounded-full"
-          height={40}
-          width={40}
-        />
-      ),
-    },
+
     {
       title: "Action",
       key: "action",
@@ -236,7 +383,7 @@ const NewAccount = () => {
             title="Are you Sure ?"
             description="Once update, you can also re-update !"
             onCancel={() => messageApi.info("No changes occur !")}
-            onConfirm={() => onEditUser(obj)}
+            onConfirm={() => onEditCustomer(obj)}
           >
             <Button
               type="text"
@@ -248,12 +395,12 @@ const NewAccount = () => {
             title="Are you sure ?"
             description="Once you deleted, you can not restore !"
             onCancel={() => messageApi.info("Your data is safe !")}
-            onConfirm={() => onDeleteUser(obj._id)}
+            onConfirm={() => onDeleteCustomer(obj._id)}
           >
             <Button
               type="text"
               className="!bg-rose-100 !text-rose-500"
-              icon={<DeleteOutlined />}
+              icon={<DeleteFilled />}
             />
           </Popconfirm>
         </div>
@@ -273,7 +420,7 @@ const NewAccount = () => {
               <Input
                 placeholder="Search by all"
                 prefix={<SearchOutlined />}
-                // onChange={onSearch}
+                onChange={onSearch}
               />
               <Button
                 type="text"
@@ -287,7 +434,7 @@ const NewAccount = () => {
         >
           <Table
             columns={columns}
-            dataSource={[]}
+            dataSource={allCustomer}
             scroll={{ x: "max-content" }}
           />
         </Card>

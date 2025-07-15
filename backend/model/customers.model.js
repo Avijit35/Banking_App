@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 const customerSchema = new Schema(
   {
     accountNo: String,
-    fullName: String,
+    fullname: String,
     mobile: String,
     fatherName: String,
     email: {

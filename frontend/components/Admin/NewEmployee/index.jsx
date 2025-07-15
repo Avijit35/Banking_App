@@ -35,7 +35,7 @@ const NewEmployee = () => {
   const [photo, setPhoto] = useState(null);
   const [messageApi, context] = message.useMessage();
   const [allEmployee, setAllEmployee] = useState([]);
-  const [finalEmployees, setfinalEmployees] = useState([]);
+  const [finalEmployees, setFinalEmployees] = useState([]);
   const [allBranch, setAllBranch] = useState([]);
   const [no, setNo] = useState(0);
   const [edit, setEdit] = useState(null);
@@ -69,8 +69,8 @@ const NewEmployee = () => {
       try {
         const httpReq = http();
         const { data } = await httpReq.get("/api/users");
-        setAllEmployee(data.data);
-        setfinalEmployees(data.data);
+        setAllEmployee(data?.data);
+        setFinalEmployees(data?.data);
       } catch (error) {
         messageApi.error("Unable to fetch data !");
       }
@@ -155,6 +155,7 @@ const NewEmployee = () => {
     try {
       setLoading(true);
       const finalObj = trimData(values);
+      delete finalObj.password;
       if (photo) {
         finalObj.profile = photo;
       }
@@ -356,7 +357,7 @@ const NewEmployee = () => {
                 <Input type="number" />
               </Item>
               <Item name="email" label="Email" rules={[{ required: true }]}>
-                <Input />
+                <Input disabled={edit ? true : false} />
               </Item>
               <Item
                 name="password"
