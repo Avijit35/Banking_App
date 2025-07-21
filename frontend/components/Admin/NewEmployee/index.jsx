@@ -69,8 +69,11 @@ const NewEmployee = () => {
       try {
         const httpReq = http();
         const { data } = await httpReq.get("/api/users");
-        setAllEmployee(data?.data);
-        setFinalEmployees(data?.data);
+
+        setAllEmployee(data?.data.filter((emp) => emp.userType != "customer"));
+        setFinalEmployees(
+          data?.data.filter((emp) => emp.userType != "customer")
+        );
       } catch (error) {
         messageApi.error("Unable to fetch data !");
       }

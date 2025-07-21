@@ -25,6 +25,7 @@ const customerSchema = new Schema(
     address: String,
     userType: String,
     branch: String,
+    customerLoginId: String,
     createdBy: String,
     isActive: {
       type: Boolean,
