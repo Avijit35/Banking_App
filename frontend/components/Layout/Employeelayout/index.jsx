@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   AccountBookOutlined,
+  BranchesOutlined,
   DashboardOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
@@ -28,9 +29,14 @@ const Employeelayout = ({ children }) => {
       label: <Link to="/employee">Dashboard</Link>,
     },
     {
-      key: "/employee/new-employee",
+      key: "/employee/new-account",
       icon: <AccountBookOutlined />,
-      label: <Link to="/employee/new-employee">New Account</Link>,
+      label: <Link to="/employee/new-account">New Account</Link>,
+    },
+    {
+      key: "/employee/new-transaction",
+      icon: <BranchesOutlined />,
+      label: <Link to="/employee/new-transaction">New Transaction</Link>,
     },
     {
       key: "/employee/logout",
