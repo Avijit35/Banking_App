@@ -1,7 +1,7 @@
 import { Button, Card, Empty, Form, Image, Input, message, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
-import { http } from "../../../modules/modules.js";
+import { http, trimData } from "../../../modules/modules.js";
 
 const { Item } = Form;
 
@@ -17,8 +17,37 @@ const NewTransaction = () => {
   const [accountNo, setAccountNo] = useState(null);
   const [accountDetail, setAccountDetail] = useState(null);
 
-  const onFinish = (values) => {
-    console.log(values);
+  const onFinish = async (values) => {
+    try {
+      const finalObj = trimData(values);
+      let balance = 0;
+
+      if (finalObj.transctionType === "cr") {
+        balance =
+          Number(accountDetail.finalBalance) +
+          Number(finalObj.transactionAmount);
+      } else if (finalObj.transctionType === "dr") {
+        balance =
+          Number(accountDetail.finalBalance) -
+          Number(finalObj.transactionAmount);
+      }
+
+      finalObj.currentBalance = accountDetail.finalBalance;
+      finalObj.customerId = accountDetail._id;
+      finalObj.accountNo = accountDetail.accountNo;
+
+      const httpReq = http();
+      await httpReq.post("/api/transaction", finalObj);
+      await httpReq.put(`/api/customers/${accountDetail._id}`, {
+        finalBalance: balance,
+      });
+
+      messageApi.success("Transaction created successfully");
+      transactionForm.resetFields();
+      setAccountDetail(null);
+    } catch (error) {
+      messageApi.error("Unable to process transaction");
+    }
   };
 
   const searchByAccountNo = async () => {

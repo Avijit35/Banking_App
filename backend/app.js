@@ -23,6 +23,7 @@ import loginRouter from "./routes/login.routes.js";
 import verifyRouter from "./routes/verify.routes.js";
 import customerRouter from "./routes/customer.routes.js";
 import findByAccountRouter from "./routes/findByAccount.js";
+import transactionRouter from "./routes/transaction.routes.js";
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -46,6 +47,7 @@ app.use("/api/currency", currencyRouter);
 app.use("/api/login", loginRouter);
 app.use("/api/customers", customerRouter);
 app.use("/api/find-by-account", findByAccountRouter);
+app.use("/api/transaction", transactionRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
