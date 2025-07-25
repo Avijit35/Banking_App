@@ -2,6 +2,7 @@ import {
   createNewRecord,
   deleteRecord,
   findAllRecord,
+  findOneRecord,
   updateRecord,
 } from "../services/db.service.js";
 
@@ -82,4 +83,19 @@ const deleteData = async (req, res, schema) => {
   }
 };
 
-export { createData, fetchData, deleteData, updateData };
+const findByAccountNo = async (req, res, schema) => {
+  try {
+    const query = req.body;
+    const dbRes = await findOneRecord(query, schema);
+    return res.status(200).json({
+      messge: "Record found !",
+      data: dbRes,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      messge: "Internal server error !",
+    });
+  }
+};
+
+export { createData, fetchData, deleteData, updateData, findByAccountNo };

@@ -1,6 +1,7 @@
 import { Button, Card, Empty, Form, Image, Input, message, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useState } from "react";
+import { http } from "../../../modules/modules.js";
 
 const { Item } = Form;
 
@@ -21,7 +22,24 @@ const NewTransaction = () => {
   };
 
   const searchByAccountNo = async () => {
-    alert(accountNo);
+    try {
+      const obj = {
+        accountNo,
+        branch: userInfo?.branch,
+      };
+
+      const httpReq = http();
+      const { data } = await httpReq.post("/api/find-by-account", obj);
+
+      if (data?.data) {
+        setAccountDetail(data?.data);
+      } else {
+        setAccountDetail(null);
+        messageApi.error("There is no record of this account no !");
+      }
+    } catch (err) {
+      messageApi.error("Unable to find account details !");
+    }
   };
 
   return (
@@ -46,12 +64,16 @@ const NewTransaction = () => {
           <div>
             <div className="flex items-center justify-start gap-2">
               <Image
-                src={`${import.meta.env.VITE_BASEURL}/bankImages/userImage.jpg`}
+                src={`${import.meta.env.VITE_BASEURL}/${
+                  accountDetail?.profile
+                }`}
                 width={120}
                 className="rounded-full"
               />
               <Image
-                src={`${import.meta.env.VITE_BASEURL}/bankImages/userImage.jpg`}
+                src={`${import.meta.env.VITE_BASEURL}/${
+                  accountDetail?.signature
+                }`}
                 width={120}
                 className="rounded-full"
               />
@@ -60,23 +82,27 @@ const NewTransaction = () => {
               <div className="mt-3 flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <b>Name :</b>
-                  <b>Avijit Manna</b>
+                  <b>{accountDetail?.fullname}</b>
                 </div>
                 <div className="flex justify-between items-center">
                   <b>Mobile :</b>
-                  <b>9163920683</b>
+                  <b>{accountDetail?.mobile}</b>
                 </div>
                 <div className="flex justify-between items-center">
                   <b>Balance :</b>
-                  <b>500000</b>
+                  <b>
+                    {accountDetail?.currency === "inr" && "₹"}
+                    {accountDetail?.currency === "usd" && "$"}{" "}
+                    {accountDetail?.finalBalance}
+                  </b>
                 </div>
                 <div className="flex justify-between items-center">
                   <b>DOB :</b>
-                  <b>11-12-1994</b>
+                  <b>{accountDetail?.dob}</b>
                 </div>
                 <div className="flex justify-between items-center">
                   <b>Currency :</b>
-                  <b>INR</b>
+                  <b>{accountDetail?.currency}</b>
                 </div>
               </div>
               <div></div>
