@@ -3,20 +3,16 @@ import {
   AccountBookOutlined,
   BranchesOutlined,
   DashboardOutlined,
-  DollarCircleOutlined,
-  GiftOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
-  UserAddOutlined,
-  UserOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, theme } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
 const { Header, Sider, Content } = Layout;
 
-const Adminlayout = ({ children }) => {
+const Customerlayout = ({ children }) => {
   const cookies = new Cookies();
   const navigate = useNavigate();
 
@@ -28,42 +24,17 @@ const Adminlayout = ({ children }) => {
 
   const items = [
     {
-      key: "/admin",
+      key: "/customer",
       icon: <DashboardOutlined />,
-      label: <Link to="/admin">Dashboard</Link>,
+      label: <Link to="/customer">Dashboard</Link>,
     },
     {
-      key: "/admin/branding",
-      icon: <GiftOutlined />,
-      label: <Link to="/admin/branding">Branding</Link>,
-    },
-    {
-      key: "/admin/branch",
+      key: "/customer/transaction",
       icon: <BranchesOutlined />,
-      label: <Link to="/admin/branch">Branch</Link>,
+      label: <Link to="/customer/transaction">Transaction</Link>,
     },
     {
-      key: "/admin/currency",
-      icon: <DollarCircleOutlined />,
-      label: <Link to="/admin/currency">Currency</Link>,
-    },
-    {
-      key: "/admin/new-employee",
-      icon: <UserOutlined />,
-      label: <Link to="/admin/new-employee">New Employee</Link>,
-    },
-    {
-      key: "/admin/new-account",
-      icon: <AccountBookOutlined />,
-      label: <Link to="/admin/new-account">New Account</Link>,
-    },
-    {
-      key: "/admin/new-transaction",
-      icon: <BranchesOutlined />,
-      label: <Link to="/admin/new-transaction">New Transaction</Link>,
-    },
-    {
-      key: "/admin/logout",
+      key: "/customer/logout",
       icon: <LogoutOutlined />,
       label: (
         <Button
@@ -123,4 +94,4 @@ const Adminlayout = ({ children }) => {
     </Layout>
   );
 };
-export default Adminlayout;
+export default Customerlayout;
