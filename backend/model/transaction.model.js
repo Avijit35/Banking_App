@@ -3,11 +3,12 @@ import mongoose, { Schema } from "mongoose";
 const transactionSchema = new Schema(
   {
     transctionType: String,
-    transactionAmount: String,
+    transactionAmount: Number,
     reference: String,
     currentBalance: String,
     customerId: String,
     accountNo: String,
+    branch: String,
     Key: String,
   },
   { timestamps: true }

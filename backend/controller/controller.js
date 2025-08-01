@@ -83,6 +83,7 @@ const deleteData = async (req, res, schema) => {
   }
 };
 
+//find by account no
 const findByAccountNo = async (req, res, schema) => {
   try {
     const query = req.body;
@@ -98,4 +99,90 @@ const findByAccountNo = async (req, res, schema) => {
   }
 };
 
-export { createData, fetchData, deleteData, updateData, findByAccountNo };
+//transaction summary
+const getTransactionSummary = async (req, res, schema) => {
+  const { branch } = req.query;
+  try {
+    const summary = await schema.aggregate([
+      {
+        $match: { branch },
+      },
+      {
+        $group: {
+          _id: null,
+          totalCredit: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$transctionType", "cr"] },
+                then: "$transactionAmount",
+                else: 0,
+              },
+            },
+          },
+          creditCount: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$transctionType", "cr"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
+          totalDebit: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$transctionType", "dr"] },
+                then: "$transactionAmount",
+                else: 0,
+              },
+            },
+          },
+          debitCount: {
+            $sum: {
+              $cond: {
+                if: { $eq: ["$transctionType", "dr"] },
+                then: 1,
+                else: 0,
+              },
+            },
+          },
+          totalTransactions: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalTransactions: 1,
+          totalCredit: 1,
+          creditCount: 1,
+          totalDebit: 1,
+          debitCount: 1,
+          balance: { $subtract: ["$totalCredit", "$totalDebit"] },
+        },
+      },
+    ]);
+
+    if (summary.length === 0) {
+      return res.status(404).json({
+        messge: "No matching transaction found",
+      });
+    }
+    return res.status(200).json(summary[0]);
+  } catch (error) {
+    return res.status(500).json({
+      messge: "Error calcutating summary",
+      error,
+    });
+  }
+};
+
+export {
+  createData,
+  fetchData,
+  deleteData,
+  updateData,
+  findByAccountNo,
+  getTransactionSummary,
+};
