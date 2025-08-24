@@ -5,7 +5,7 @@ import {
   MinusOutlined,
   DollarOutlined,
 } from "@ant-design/icons";
-const Dashboard = () => {
+const Dashboard = ({ data }) => {
   return (
     <div>
       <div className="grid md:grid-cols-4 gap-6">
@@ -25,8 +25,14 @@ const Dashboard = () => {
             </div>
             <Divider type="vertical" className="h-24" />
             <div>
-              <h1 className="text-3xl font-bold text-rose-400">45 T</h1>
-              <p className="text-lg mt-1 text-zinc-400">44,563</p>
+              <h1 className="text-3xl font-bold text-rose-400">
+                {data?.totalTransactions || 0} T
+              </h1>
+              <p className="text-lg mt-1 text-zinc-400">
+                {Math.floor(
+                  data?.totalTransactions + (data?.totalTransactions * 50) / 100
+                ) || 0}
+              </p>
             </div>
           </div>
         </Card>
@@ -44,8 +50,14 @@ const Dashboard = () => {
             </div>
             <Divider type="vertical" className="h-24" />
             <div>
-              <h1 className="text-3xl font-bold text-green-400">25 T</h1>
-              <p className="text-lg mt-1 text-zinc-400">24,563</p>
+              <h1 className="text-3xl font-bold text-green-400">
+                {data?.totalCredit || 0} T
+              </h1>
+              <p className="text-lg mt-1 text-zinc-400">
+                {Math.floor(
+                  data?.totalCredit + (data?.totalCredit * 50) / 100
+                ) || 0}
+              </p>
             </div>
           </div>
         </Card>
@@ -63,8 +75,13 @@ const Dashboard = () => {
             </div>
             <Divider type="vertical" className="h-24" />
             <div>
-              <h1 className="text-3xl font-bold text-orange-400">18 T</h1>
-              <p className="text-lg mt-1 text-zinc-400">17,563</p>
+              <h1 className="text-3xl font-bold text-orange-400">
+                {data?.totalDebit || 0} T
+              </h1>
+              <p className="text-lg mt-1 text-zinc-400">
+                {Math.floor(data?.totalDebit + (data?.totalDebit * 50) / 100) ||
+                  0}
+              </p>
             </div>
           </div>
         </Card>
@@ -82,8 +99,12 @@ const Dashboard = () => {
             </div>
             <Divider type="vertical" className="h-24" />
             <div>
-              <h1 className="text-3xl font-bold text-blue-400">88 T</h1>
-              <p className="text-lg mt-1 text-zinc-400">87,563</p>
+              <h1 className="text-3xl font-bold text-blue-400">
+                {data?.balance || 0} T
+              </h1>
+              <p className="text-lg mt-1 text-zinc-400">
+                {Math.floor(data?.balance + (data?.balance * 50) / 100) || 0}
+              </p>
             </div>
           </div>
         </Card>

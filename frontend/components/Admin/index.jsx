@@ -17,11 +17,9 @@ const AdminDashboard = () => {
     }
   );
 
-  console.log(trData);
-
   return (
     <Adminlayout>
-      <Dashboard />
+      <Dashboard data={trData && trData} />
     </Adminlayout>
   );
 };

@@ -101,11 +101,16 @@ const findByAccountNo = async (req, res, schema) => {
 
 //transaction summary
 const getTransactionSummary = async (req, res, schema) => {
-  const { branch } = req.query;
+  const { branch, accountNo } = req.query;
+
+  let matchQuery = {};
+  if (branch) matchQuery.branch = branch;
+  if (accountNo) matchQuery.accountNo = accountNo;
+
   try {
     const summary = await schema.aggregate([
       {
-        $match: { branch },
+        $match: matchQuery,
       },
       {
         $group: {

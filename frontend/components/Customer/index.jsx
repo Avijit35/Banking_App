@@ -1,10 +1,25 @@
 import Customerlayout from "../Layout/Customerlayout";
 import Dashboard from "../Shared/Dashboard";
+import useSWR from "swr";
+import { fetchData } from "../../modules/modules";
 
 const CustomerDashboard = () => {
+  //get userinfo from sessnioStorage
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
+  const { data: trData, error: trError } = useSWR(
+    `/api/transaction/summary?accountNo=${userInfo.accountNo}`,
+    fetchData,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 120000,
+    }
+  );
+
   return (
     <Customerlayout>
-      <Dashboard />
+      <Dashboard data={trData && trData} />
     </Customerlayout>
   );
 };

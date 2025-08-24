@@ -1,6 +1,7 @@
 import { findOneRecord } from "../services/db.service.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Customer } from "../model/customers.model.js";
 
 const LoginFunc = async (req, res, schema) => {
   try {
@@ -31,11 +32,22 @@ const LoginFunc = async (req, res, schema) => {
         isLogged: false,
       });
     }
+
+    const dbCustomer = await Customer.findOne({ email });
+
     delete dbRes._doc.password;
-    const payload = {
-      ...dbRes._doc,
-      _id: dbRes._id.toString(),
-    };
+    let payload = null;
+
+    dbCustomer
+      ? (payload = {
+          ...dbRes._doc,
+          _id: dbRes._id.toString(),
+          accountNo: dbCustomer.accountNo,
+        })
+      : (payload = {
+          ...dbRes._doc,
+          _id: dbRes._id.toString(),
+        });
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRY,
