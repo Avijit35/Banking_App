@@ -3,6 +3,7 @@ import {
   createData,
   deleteData,
   fetchData,
+  getPaginatedTransaction,
   getTransactionSummary,
   updateData,
 } from "../controller/controller.js";
@@ -16,6 +17,10 @@ router.route("/").get((req, res) => {
 
 router.route("/summary").get((req, res) => {
   getTransactionSummary(req, res, Transaction);
+});
+
+router.route("/pagination").get((req, res) => {
+  getPaginatedTransaction(req, res, Transaction);
 });
 
 router.route("/").post((req, res) => {

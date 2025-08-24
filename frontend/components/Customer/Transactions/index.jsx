@@ -1,11 +1,13 @@
 import Customerlayout from "../../Layout/Customerlayout";
+import TransactionTable from "../../Shared/TransactionTable";
 
 const CustomerTransactions = () => {
+  //get userInfo from storage
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
   return (
     <Customerlayout>
-      <h2 className="text-5xl text-red-500 font-bold">
-        welcome to customer transactions
-      </h2>
+      <TransactionTable query={{ accountNo: userInfo?.accountNo }} />
     </Customerlayout>
   );
 };

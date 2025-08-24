@@ -183,6 +183,35 @@ const getTransactionSummary = async (req, res, schema) => {
   }
 };
 
+const getPaginatedTransaction = async (req, res, schema) => {
+  try {
+    const { branch, accountNo, page = 1, pageSize = 10 } = req.query;
+
+    const filter = {};
+    if (branch) filter.branch = branch;
+    if (accountNo) filter.accountNo = accountNo;
+
+    let skip = parseInt(page - 1) * parseInt(pageSize);
+    let limit = parseInt(pageSize);
+
+    const [transactions, total] = await Promise.all([
+      schema.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      schema.countDocuments(filter),
+    ]);
+
+    return res.status(200).json({
+      data: transactions,
+      total,
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ messge: "Error fetching transactions", error });
+  }
+};
+
 export {
   createData,
   fetchData,
@@ -190,4 +219,5 @@ export {
   updateData,
   findByAccountNo,
   getTransactionSummary,
+  getPaginatedTransaction,
 };
